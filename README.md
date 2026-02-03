@@ -1,5 +1,9 @@
 # ⏱️ Hour Meter
 
+[![ClawHub](https://img.shields.io/badge/ClawHub-hour--meter-blue?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQyIDAtOC0zLjU4LTgtOHMzLjU4LTggOC04IDggMy41OCA4IDgtMy41OCA4LTggOHoiLz48L3N2Zz4=)](https://www.clawhub.com/skills/hour-meter)
+[![GitHub](https://img.shields.io/github/stars/rm289/hour-meter?style=social)](https://github.com/rm289/hour-meter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ```
 ╔═══════════════════════════════════════════════════════════════════╗
 ║   ██╗  ██╗ ██████╗ ██╗   ██╗██████╗                               ║
