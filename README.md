@@ -159,12 +159,17 @@ meter.py verify smoke-free "A7F3-B92C-1D4E-8F6A-7"
 
 ---
 
-## 📦 Four Ways to Save Your Verification Code
+## 📦 Five Ways to Save Your Verification Code
 
 1. **Paper** — Write the code on a sticky note or in a notebook
 2. **Photo** — Screenshot or photograph the lock screen
 3. **Witness File** — Auto-saved to `~/.openclaw/meter-witness.txt` (sync to Dropbox/iCloud)
-4. **Email** — Click the mailto: link or copy the one-liner to send to yourself
+4. **Email (mailto)** — Click the mailto: link or copy the one-liner to send to yourself
+5. **Email (SendGrid)** — Auto-send on lock with `--email`:
+   ```bash
+   export SENDGRID_API_KEY=SG.xxxxx
+   meter.py lock my-meter --email you@example.com
+   ```
 
 ---
 

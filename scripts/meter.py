@@ -17,6 +17,8 @@ import argparse
 import os
 import sys
 import base64
+import urllib.request
+import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -370,6 +372,138 @@ def cmd_check_milestones(args):
     
     print(json.dumps({"triggered": triggered}, indent=2))
 
+def send_email_sendgrid(to_email: str, subject: str, html_content: str, text_content: str,
+                        from_email: str = None) -> tuple[bool, str]:
+    """
+    Send email via SendGrid API.
+    Requires SENDGRID_API_KEY environment variable.
+    Returns (success, message).
+    """
+    api_key = os.environ.get("SENDGRID_API_KEY")
+    if not api_key:
+        return False, "SENDGRID_API_KEY environment variable not set"
+    
+    # Default from email
+    if not from_email:
+        from_email = os.environ.get("SENDGRID_FROM_EMAIL", "hour-meter@noreply.example.com")
+    
+    payload = {
+        "personalizations": [{"to": [{"email": to_email}]}],
+        "from": {"email": from_email, "name": "Hour Meter"},
+        "subject": subject,
+        "content": [
+            {"type": "text/plain", "value": text_content},
+            {"type": "text/html", "value": html_content}
+        ]
+    }
+    
+    data = json.dumps(payload).encode('utf-8')
+    
+    req = urllib.request.Request(
+        "https://api.sendgrid.com/v3/mail/send",
+        data=data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            return True, f"Email sent to {to_email}"
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else str(e)
+        return False, f"SendGrid error {e.code}: {error_body}"
+    except urllib.error.URLError as e:
+        return False, f"Network error: {e.reason}"
+
+
+def generate_verification_email(meter_name: str, paper_code: str, full_hash: str,
+                                 description: str, lock_time: str) -> tuple[str, str, str]:
+    """Generate email subject, HTML content, and text content for verification email."""
+    
+    subject = f"🔒 Hour Meter Verification Code: {meter_name}"
+    
+    text_content = f"""HOUR METER VERIFICATION CODE
+{'='*40}
+
+Meter: {meter_name}
+Description: {description or 'N/A'}
+Locked: {lock_time}
+
+📋 PAPER CODE (save this!):
+
+    {paper_code}
+
+To verify later, run:
+    meter.py verify {meter_name} "{paper_code}"
+
+Full hash: {full_hash}
+
+---
+This code proves the meter hasn't been tampered with.
+Keep this email - you'll need the paper code to verify.
+"""
+    
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f5; }}
+        .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .header {{ text-align: center; margin-bottom: 30px; }}
+        .header h1 {{ color: #333; margin: 0; }}
+        .code-box {{ background: #1a1a2e; color: #00ff88; padding: 30px; border-radius: 8px; text-align: center; margin: 20px 0; }}
+        .code {{ font-family: 'SF Mono', Monaco, monospace; font-size: 28px; letter-spacing: 3px; font-weight: bold; }}
+        .details {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+        .details table {{ width: 100%; border-collapse: collapse; }}
+        .details td {{ padding: 8px 0; }}
+        .details td:first-child {{ color: #666; width: 120px; }}
+        .verify-cmd {{ background: #2d2d2d; color: #e0e0e0; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 14px; overflow-x: auto; }}
+        .footer {{ text-align: center; color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }}
+        .hash {{ font-family: monospace; font-size: 11px; color: #999; word-break: break-all; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Meter Locked</h1>
+            <p style="color: #666;">Your verification code is below</p>
+        </div>
+        
+        <div class="code-box">
+            <div class="code">{paper_code}</div>
+            <p style="color: #888; margin: 10px 0 0 0; font-size: 14px;">Paper Code</p>
+        </div>
+        
+        <div class="details">
+            <table>
+                <tr><td>Meter</td><td><strong>{meter_name}</strong></td></tr>
+                <tr><td>Description</td><td>{description or 'N/A'}</td></tr>
+                <tr><td>Locked</td><td>{lock_time}</td></tr>
+            </table>
+        </div>
+        
+        <h3>To verify later:</h3>
+        <div class="verify-cmd">
+            meter.py verify {meter_name} "{paper_code}"
+        </div>
+        
+        <div class="footer">
+            <p>This code proves your meter hasn't been tampered with.</p>
+            <p>Keep this email safe - you'll need the paper code to verify.</p>
+            <p class="hash">Full hash: {full_hash}</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+    
+    return subject, html_content, text_content
+
+
 def generate_mailto_link(meter_name: str, paper_code: str, full_hash: str, 
                          description: str, lock_time: str) -> str:
     """Generate a mailto: link for emailing the verification code to yourself."""
@@ -482,6 +616,21 @@ def cmd_lock(args):
     print(f"   Full hash (for nerds): {full_hash}")
     print()
     print(f"   To verify later: meter.py verify {args.name} {paper_code}")
+    
+    # Send email if requested
+    if hasattr(args, 'email') and args.email:
+        print()
+        print(f"   📧 Sending verification email...")
+        subject, html_content, text_content = generate_verification_email(
+            args.name, paper_code, full_hash,
+            meter.get("description", ""), lock_time_str
+        )
+        from_email = getattr(args, 'from_email', None)
+        success, message = send_email_sendgrid(args.email, subject, html_content, text_content, from_email)
+        if success:
+            print(f"   ✅ {message}")
+        else:
+            print(f"   ❌ {message}")
 
 def cmd_check(args):
     """Check a meter's status."""
@@ -812,6 +961,8 @@ def main():
     # Lock
     p_lock = subparsers.add_parser("lock", help="Lock meter")
     p_lock.add_argument("name", help="Meter name")
+    p_lock.add_argument("--email", "-e", help="Send verification code to this email address (requires SENDGRID_API_KEY)")
+    p_lock.add_argument("--from-email", help="From email address (default: SENDGRID_FROM_EMAIL or hour-meter@noreply.example.com)")
     p_lock.set_defaults(func=cmd_lock)
     
     # Check

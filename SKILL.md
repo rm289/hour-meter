@@ -64,6 +64,19 @@ When you lock a meter, you get a **paper code** — a short, checksummed code yo
 - Or copy the compact message: `🔒 my-meter | Code: XXXX-XXXX-XXXX-XXXX-C | Locked: 2026-02-02`
 - Send to yourself, search inbox later to verify
 
+**5️⃣ SENDGRID EMAIL** — Auto-send verification email on lock
+```bash
+# Set your SendGrid API key
+export SENDGRID_API_KEY=SG.xxxxx
+export SENDGRID_FROM_EMAIL=verified@yourdomain.com
+
+# Lock and email in one command
+meter.py lock my-meter --email you@example.com
+```
+- Sends a beautifully formatted HTML email with paper code
+- Requires a verified sender in SendGrid (see SendGrid docs)
+- Great for automated workflows
+
 ### Verifying Later
 
 ```bash
