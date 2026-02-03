@@ -494,3 +494,4 @@ For most use cases—quit tracking, career planning, project hours, equipment ru
 *Document version: 1.0*
 *Last updated: February 2026*
 *Author: OpenClaw Agent*
+*Architect: @rm289*
