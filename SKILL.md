@@ -1,0 +1,124 @@
+---
+name: hour-meter
+description: Track elapsed time from a set epoch with tamper-evident locking. Like an analog Hobbs meter but digital. Use for tracking uptime, service hours, time since events, sobriety counters, project duration, equipment runtime. Supports create, lock (seal), check, verify against external hash, list, and export operations.
+---
+
+# Hour Meter
+
+Life event tracker with three modes, milestone notifications, and tamper-evident verification.
+
+## Three Modes
+
+### COUNT UP — Time since an event
+```bash
+# Quit smoking tracker
+meter.py create smoke-free --start "2025-06-15T08:00:00Z" -d "Last cigarette"
+meter.py milestone smoke-free -t hours -v 720 -m "🎉 30 days smoke-free!"
+meter.py lock smoke-free  # → Gives you paper code to save
+```
+
+### COUNT DOWN — Time until an event
+```bash
+# Baby due date
+meter.py create baby --start "2026-01-15" --end "2026-10-15" --mode down -d "Baby arriving!"
+meter.py milestone baby -t percent -v 33 -m "👶 First trimester complete!"
+```
+
+### COUNT BETWEEN — Journey from start to end
+```bash
+# Career span
+meter.py create career --start "1998-05-15" --end "2038-05-15" -d "40-year career"
+meter.py milestone career -t percent -v 50 -m "📊 Halfway through career!"
+meter.py career --meter career --rate 85 --raise-pct 2.5
+```
+
+## Tamper-Evident Persistence
+
+When you lock a meter, you get a **paper code** — a short, checksummed code you can write on paper:
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║  PAPER CODE (write this down):                               ║
+║     318B-3229-C523-2F9C-V                                    ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+### Four Ways to Save (Non-Technical)
+
+**1️⃣ PAPER** — Write the code on paper/sticky note
+- 20 characters with dashes, easy to copy
+- Built-in checksum catches typos when verifying
+- Keep in wallet, safe, or taped to equipment
+
+**2️⃣ PHOTO** — Screenshot or photograph the lock screen
+- Store in camera roll, cloud photos
+- Visual backup, no typing required
+
+**3️⃣ WITNESS FILE** — Auto-saved to `~/.openclaw/meter-witness.txt`
+- Append-only log of all locked meters
+- Sync folder to Dropbox/iCloud/Google Drive for cloud backup
+- Contains paper code + full hash + timestamp
+
+**4️⃣ EMAIL TO SELF** — Click the mailto: link or copy the one-liner
+- Opens your email client with pre-filled subject and body
+- Or copy the compact message: `🔒 my-meter | Code: XXXX-XXXX-XXXX-XXXX-C | Locked: 2026-02-02`
+- Send to yourself, search inbox later to verify
+
+### Verifying Later
+
+```bash
+# With paper code (catches typos!)
+meter.py verify my-meter "318B-3229-C523-2F9C-V"
+
+# → ✅ VERIFIED! Paper code matches.
+# → ⚠️ CHECKSUM ERROR! (if you have a typo)
+# → ❌ MISMATCH! (if tampered)
+```
+
+## Milestones
+
+```bash
+meter.py milestone <name> --type hours --value 1000 --message "1000 hours!"
+meter.py milestone <name> --type percent --value 50 --message "Halfway!"
+meter.py check-milestones  # JSON output for automation
+```
+
+### Milestone Notifications: Heartbeat vs Cron
+
+**Recommended: HEARTBEAT** (~30 min resolution)
+- Add to `HEARTBEAT.md`: `Run meter.py check-milestones and notify triggered`
+- Batches with other periodic checks
+- Cost-efficient: shares token usage with other heartbeat tasks
+- Good for most use cases (quit tracking, career milestones, etc.)
+
+**Alternative: CRON** (precise timing)
+- Use when exact timing matters (e.g., countdown to event)
+- ⚠️ **Cost warning:** Cron at 1-minute intervals = 1,440 API calls/day = expensive!
+- If using cron, keep intervals ≥15 minutes to manage costs
+- Best for one-shot reminders, not continuous monitoring
+
+**Rule of thumb:** If 30-minute resolution is acceptable, use heartbeat. Save cron for precision timing.
+
+## Quick Reference
+
+```bash
+meter.py create <name> [--start T] [--end T] [--mode up|down|between] [-d DESC]
+meter.py lock <name>                # Seal + get paper code
+meter.py verify <name> <code>       # Verify paper code
+meter.py check <name>               # Status + progress
+meter.py milestone <name> -t hours|percent -v N -m "..."
+meter.py check-milestones           # All milestones (JSON)
+meter.py witness [--show] [--path]  # Witness file
+meter.py list                       # All meters
+meter.py career [--meter M] [--rate R] [--raise-pct P]
+meter.py export [name]              # JSON export
+```
+
+## The 80,000 Hours Concept
+
+Career as finite inventory: 40 years × 2,000 hrs/year = 80,000 hours.
+
+```bash
+meter.py career --hours-worked 56000 --rate 85 --raise-pct 2.5
+# → 12.3 years remaining, $2.4M earning potential
+```

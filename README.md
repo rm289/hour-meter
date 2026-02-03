@@ -1,0 +1,204 @@
+# ⏱️ Hour Meter
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║   ██╗  ██╗ ██████╗ ██╗   ██╗██████╗                               ║
+║   ██║  ██║██╔═══██╗██║   ██║██╔══██╗                              ║
+║   ███████║██║   ██║██║   ██║██████╔╝                              ║
+║   ██╔══██║██║   ██║██║   ██║██╔══██╗                              ║
+║   ██║  ██║╚██████╔╝╚██████╔╝██║  ██║                              ║
+║   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝                              ║
+║   ███╗   ███╗███████╗████████╗███████╗██████╗                     ║
+║   ████╗ ████║██╔════╝╚══██╔══╝██╔════╝██╔══██╗                    ║
+║   ██╔████╔██║█████╗     ██║   █████╗  ██████╔╝                    ║
+║   ██║╚██╔╝██║██╔══╝     ██║   ██╔══╝  ██╔══██╗                    ║
+║   ██║ ╚═╝ ██║███████╗   ██║   ███████╗██║  ██║                    ║
+║   ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝                    ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+**The moments that matter, measured and verified.**
+
+---
+
+**Concept & Design:** Ross ([@rm289](https://github.com/rm289))  
+**Implementation:** Claude (OpenClaw Agent)
+
+---
+
+## What is Hour Meter?
+
+Hour Meter is a tamper-evident time tracking skill for OpenClaw. Inspired by the analog Hobbs meters bolted to aircraft engines and industrial equipment, it brings that same reliability to the digital world—with cryptographic proof that your timestamps haven't been altered.
+
+---
+
+## 📸 Screenshots
+
+### Check a meter's status
+```
+⏱️  Meter: my-career (BETWEEN)
+   Career: College graduation → Retirement
+
+   📍 Start:     2024-05-15 14:00:00 UTC
+   🎯 End:       2064-05-15 14:00:00 UTC
+
+   [░░░░░░░░░░░░░░░░░░░░] 4.3%
+
+   ✅ Elapsed:   628d 1h 52m (15,074 hrs)
+   ⏳ Remaining: 13,981d 22h (335,566 hrs)
+
+   Milestones:
+   ○ 25.0%: 📊 25% - Establishing expertise
+   ○ 50.0%: 📊 HALFTIME - Peak earning years
+
+   🔒 LOCKED ✓ (integrity verified)
+   📋 Paper code: F99B-C7C1-7F3B-2EDF-F
+```
+
+### Lock a meter and get your verification code
+```
+🔒 LOCKED: smoke-free
+
+╔══════════════════════════════════════════════════════════════╗
+║  PAPER CODE (write this down):                               ║
+║                                                              ║
+║     A7F3-B92C-1D4E-8F6A-7                                    ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 FOUR WAYS TO SAVE THIS:
+
+   1️⃣  PAPER: Write the code on paper/sticky note
+   2️⃣  PHOTO: Screenshot this screen  
+   3️⃣  WITNESS FILE: Auto-saved to ~/.openclaw/meter-witness.txt
+   4️⃣  EMAIL TO SELF: Click the mailto: link
+```
+
+### Career earnings projection
+```
+📊 Career Inventory Projection
+   Based on: my-career
+   Started:  2010-05-15
+
+   ⏱️  Hours worked:     55,442 hrs (27.7 yrs)
+   ⏳ Hours remaining:  24,558 hrs (12.3 yrs)
+   📦 Total inventory:  80,000 hrs (40 yrs)
+
+   [█████████████░░░░░░░] 69.3%
+
+   💰 Current rate:     $85.00/hr
+   📈 Annual raise:     2.5%
+
+   🎯 REMAINING EARNING POTENTIAL: $2,409,035
+```
+
+---
+
+## ✨ Key Features
+
+### Three Ways to Count
+
+| Mode | Use Case | Example |
+|------|----------|---------|
+| **Count Up** | Time since an event | Quit smoking: *"142 days clean"* |
+| **Count Down** | Time until a deadline | Baby due: *"47 days remaining"* |
+| **Count Between** | Journey progress | Career: *"69% complete, 12 years to retirement"* |
+
+### 🔒 Tamper-Evident Locking
+
+Lock any meter to generate a cryptographic integrity hash. If anyone changes the start date later, verification fails. Trust, but verify.
+
+### 📋 Human-Friendly Paper Codes
+
+Forget copying 64-character hex strings. Get a short, checksummed code you can actually write on paper:
+
+```
+PAPER CODE: A7F3-B92C-1D4E-8F6A-7
+```
+
+The checksum catches typos when you verify. Write it on a sticky note, email it to yourself, or let the witness file sync to your cloud storage.
+
+### 🔔 Milestone Notifications
+
+Set triggers at specific hours or percentages:
+
+- *"Notify me at 1,000 hours smoke-free"*
+- *"Alert at 75% of pregnancy complete"*
+- *"Ping when career hits 90%"*
+
+Notifications route through any OpenClaw channel—Discord, Telegram, Signal, Slack, and more.
+
+### 💰 Career Projection Calculator
+
+Visualize your career as **80,000 hours of inventory** (40 years × 2,000 hours/year). See your remaining earning potential with compound annual raises.
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Create a meter
+meter.py create smoke-free --start "2025-06-15" -d "Last cigarette"
+
+# Add milestones
+meter.py milestone smoke-free -t hours -v 720 -m "🎉 30 days smoke-free!"
+
+# Lock it (get your paper code)
+meter.py lock smoke-free
+
+# Check status anytime
+meter.py check smoke-free
+
+# Verify with your paper code
+meter.py verify smoke-free "A7F3-B92C-1D4E-8F6A-7"
+```
+
+---
+
+## 📦 Four Ways to Save Your Verification Code
+
+1. **Paper** — Write the code on a sticky note or in a notebook
+2. **Photo** — Screenshot or photograph the lock screen
+3. **Witness File** — Auto-saved to `~/.openclaw/meter-witness.txt` (sync to Dropbox/iCloud)
+4. **Email** — Click the mailto: link or copy the one-liner to send to yourself
+
+---
+
+## 🎯 Use Cases
+
+- **Quit Tracking** — Smoking, drinking, or any habit you're breaking
+- **Career Planning** — Visualize your finite work hours and earning potential
+- **Pregnancy Countdown** — Milestones for each trimester
+- **Project Hours** — Tamper-evident billing records
+- **Equipment Runtime** — Service interval tracking
+- **Warranty Dates** — Locked start dates for disputes
+- **"Days Since" Displays** — Last incident, last deploy, last vacation
+
+---
+
+## 💡 Why Tamper-Evidence Matters
+
+Anyone can edit a text file with a date. Hour Meter creates a cryptographic proof:
+
+1. When you **lock** a meter, it computes `SHA256(name + timestamp + salt)`
+2. You save the resulting code externally (paper, email, cloud)
+3. Later, **verify** recomputes the hash and compares
+
+If the timestamp was changed, the hashes won't match. Simple, offline-capable, and human-verifiable.
+
+---
+
+## 📚 Documentation
+
+- [SKILL.md](./SKILL.md) — OpenClaw skill reference
+- [WHITEPAPER.md](./WHITEPAPER.md) — Technical deep-dive
+
+---
+
+## 📄 License
+
+MIT — Use it, modify it, ship it.
+
+---
+
+**Hour Meter** — Because some moments are worth proving. ⏱️
