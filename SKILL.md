@@ -91,6 +91,24 @@ meter.py check-milestones  # JSON output for automation
 - Cost-efficient: shares token usage with other heartbeat tasks
 - Good for most use cases (quit tracking, career milestones, etc.)
 
+### ACTION: Triggers (Agent Automation)
+
+Prefix milestone messages with `ACTION:` to trigger agent execution instead of just posting:
+
+```bash
+# Just posts the message
+meter.py milestone my-meter -t hours -v 24 -m "🎉 24 hours complete!"
+
+# Triggers agent to EXECUTE the instruction
+meter.py milestone my-meter -t hours -v 24 -m "ACTION: Check the weather and post a summary"
+```
+
+Configure in HEARTBEAT.md:
+```markdown
+- If message starts with "ACTION:", execute it as an instruction
+- Otherwise, post the message to the configured channel
+```
+
 **Alternative: CRON** (precise timing)
 - Use when exact timing matters (e.g., countdown to event)
 - ⚠️ **Cost warning:** Cron at 1-minute intervals = 1,440 API calls/day = expensive!
