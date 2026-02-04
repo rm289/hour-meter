@@ -25,6 +25,34 @@ from pathlib import Path
 # Default storage location
 DEFAULT_STORAGE = os.path.expanduser("~/.openclaw/meters.json")
 
+# Auto-load .env file if SENDGRID_API_KEY not in environment
+def _load_dotenv():
+    """Load .env file if SENDGRID_API_KEY not already set."""
+    if os.environ.get("SENDGRID_API_KEY"):
+        return
+    env_paths = [
+        os.path.expanduser("~/.env"),
+        os.path.expanduser("/root/.env"),
+        ".env"
+    ]
+    for env_path in env_paths:
+        if os.path.exists(env_path):
+            try:
+                with open(env_path) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            key, value = line.split("=", 1)
+                            key = key.strip()
+                            value = value.strip().strip('"').strip("'")
+                            if key and key not in os.environ:
+                                os.environ[key] = value
+                break
+            except Exception:
+                pass
+
+_load_dotenv()
+
 # Witness file location (for cloud sync)
 WITNESS_FILE = os.path.expanduser("~/.openclaw/meter-witness.txt")
 
