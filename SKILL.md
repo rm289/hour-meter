@@ -1,11 +1,14 @@
 ---
 name: hour-meter
+clawhub: tardis
 description: Track elapsed time from a set epoch with tamper-evident locking. Like an analog Hobbs meter but digital. Use for tracking uptime, service hours, time since events, sobriety counters, project duration, equipment runtime. Supports create, lock (seal), check, verify against external hash, list, and export operations.
 ---
 
-# Hour Meter
+# Hour Meter (TARDIS on ClawHub)
 
 Life event tracker with three modes, milestone notifications, and tamper-evident verification.
+
+> **ClawHub Note:** This skill is published as **TARDIS** on ClawHub after the original `hour-meter` listing was lost due to a repository sync issue.
 
 ## Three Modes
 
