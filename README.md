@@ -132,6 +132,20 @@ Set triggers at specific hours or percentages:
 
 Notifications route through any OpenClaw channel—Discord, Telegram, Signal, Slack, and more.
 
+### 📧 Email Milestone Notifications (v1.3.0)
+
+Get milestone alerts sent directly to your inbox:
+
+```bash
+meter.py create my-meter \
+  --notify-email you@example.com \
+  -d "Important milestone tracker"
+
+meter.py milestone my-meter -t hours -v 100 -m "🎉 100 hours reached!"
+```
+
+When milestones fire, you get a beautifully formatted email notification!
+
 ### 💰 Career Projection Calculator
 
 Visualize your career as **80,000 hours of inventory** (40 years × 2,000 hours/year). See your remaining earning potential with compound annual raises.

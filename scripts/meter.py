@@ -243,7 +243,9 @@ def cmd_create(args):
         "mode": mode,
         "milestones": [],
         "notify_channel": args.channel,
-        "notify_target": args.target
+        "notify_target": args.target,
+        "notify_email": args.notify_email,
+        "notify_from_email": args.from_email
     }
     
     data["meters"][args.name] = meter
@@ -310,13 +312,19 @@ def cmd_check_milestones(args):
     data = load_meters()
     now_ms = int(time.time() * 1000)
     triggered = []
+    email_results = []
     
     for name, meter in data["meters"].items():
         elapsed_ms = now_ms - meter["start_ms"]
         elapsed_hours = elapsed_ms / (1000 * 3600)
+        elapsed_str = format_elapsed(elapsed_ms / 1000)
         
         mode = meter.get("mode", "up")
         percent = None
+        
+        # Get email settings for this meter
+        notify_email = meter.get("notify_email")
+        notify_from_email = meter.get("notify_from_email")
         
         if mode in ["down", "between"] and meter.get("end_ms"):
             total_ms = meter["end_ms"] - meter["start_ms"]
@@ -339,8 +347,16 @@ def cmd_check_milestones(args):
                     "message": msg,
                     "channel": meter.get("notify_channel"),
                     "target": meter.get("notify_target"),
+                    "notify_email": notify_email,
                     "description": desc
                 })
+                
+                # Send email notification if configured
+                if notify_email:
+                    success, result = send_milestone_email(
+                        notify_email, name, msg, elapsed_str, desc, notify_from_email
+                    )
+                    email_results.append({"meter": name, "email": notify_email, "success": success, "result": result})
         
         # Check milestones
         for m in meter.get("milestones", []):
@@ -364,13 +380,26 @@ def cmd_check_milestones(args):
                     "message": m["message"],
                     "channel": meter.get("notify_channel"),
                     "target": meter.get("notify_target"),
+                    "notify_email": notify_email,
                     "description": meter.get("description", "")
                 })
+                
+                # Send email notification if configured
+                if notify_email:
+                    success, result = send_milestone_email(
+                        notify_email, name, m["message"], elapsed_str, 
+                        meter.get("description", ""), notify_from_email
+                    )
+                    email_results.append({"meter": name, "email": notify_email, "success": success, "result": result})
     
     if triggered:
         save_meters(data)
     
-    print(json.dumps({"triggered": triggered}, indent=2))
+    output = {"triggered": triggered}
+    if email_results:
+        output["email_notifications"] = email_results
+    
+    print(json.dumps(output, indent=2))
 
 def send_email_sendgrid(to_email: str, subject: str, html_content: str, text_content: str,
                         from_email: str = None) -> tuple[bool, str]:
@@ -502,6 +531,106 @@ Keep this email - you'll need the paper code to verify.
 """
     
     return subject, html_content, text_content
+
+
+def send_milestone_email(to_email: str, meter_name: str, milestone_message: str,
+                         elapsed_str: str, description: str, from_email: str = None) -> tuple[bool, str]:
+    """
+    Send milestone notification email via SendGrid.
+    Returns (success, message).
+    """
+    api_key = os.environ.get("SENDGRID_API_KEY")
+    if not api_key:
+        return False, "SENDGRID_API_KEY not set"
+    
+    if not from_email:
+        from_email = os.environ.get("SENDGRID_FROM_EMAIL", "hour-meter@noreply.example.com")
+    
+    subject = f"🎯 Milestone: {meter_name}"
+    
+    text_content = f"""HOUR METER MILESTONE REACHED!
+{'='*40}
+
+Meter: {meter_name}
+Description: {description or 'N/A'}
+
+🎯 MILESTONE:
+{milestone_message}
+
+⏱️ Elapsed: {elapsed_str}
+
+---
+Sent by Hour Meter
+"""
+    
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; background: #f5f5f5; }}
+        .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .header {{ text-align: center; margin-bottom: 20px; }}
+        .milestone-box {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 8px; text-align: center; margin: 20px 0; }}
+        .milestone-msg {{ font-size: 24px; font-weight: bold; margin: 0; }}
+        .details {{ background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; }}
+        .footer {{ text-align: center; color: #999; font-size: 12px; margin-top: 20px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Milestone Reached!</h1>
+        </div>
+        
+        <div class="milestone-box">
+            <p class="milestone-msg">{milestone_message}</p>
+        </div>
+        
+        <div class="details">
+            <p><strong>Meter:</strong> {meter_name}</p>
+            <p><strong>Description:</strong> {description or 'N/A'}</p>
+            <p><strong>Elapsed:</strong> {elapsed_str}</p>
+        </div>
+        
+        <div class="footer">
+            <p>⏱️ Sent by Hour Meter</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+    
+    payload = {
+        "personalizations": [{"to": [{"email": to_email}]}],
+        "from": {"email": from_email, "name": "Hour Meter"},
+        "subject": subject,
+        "content": [
+            {"type": "text/plain", "value": text_content},
+            {"type": "text/html", "value": html_content}
+        ]
+    }
+    
+    data = json.dumps(payload).encode('utf-8')
+    
+    req = urllib.request.Request(
+        "https://api.sendgrid.com/v3/mail/send",
+        data=data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            return True, f"Milestone email sent to {to_email}"
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else str(e)
+        return False, f"SendGrid error {e.code}: {error_body}"
+    except urllib.error.URLError as e:
+        return False, f"Network error: {e.reason}"
 
 
 def generate_mailto_link(meter_name: str, paper_code: str, full_hash: str, 
@@ -939,6 +1068,8 @@ def main():
     p_create.add_argument("--mode", "-m", choices=["up", "down", "between"])
     p_create.add_argument("--channel", help="Notification channel")
     p_create.add_argument("--target", help="Notification target")
+    p_create.add_argument("--notify-email", help="Email address for milestone notifications (requires SENDGRID_API_KEY)")
+    p_create.add_argument("--from-email", help="From email for notifications (default: SENDGRID_FROM_EMAIL)")
     p_create.set_defaults(func=cmd_create)
     
     # Milestone

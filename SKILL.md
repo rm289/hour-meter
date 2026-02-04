@@ -96,6 +96,32 @@ meter.py milestone <name> --type percent --value 50 --message "Halfway!"
 meter.py check-milestones  # JSON output for automation
 ```
 
+### Email Milestone Notifications (v1.3.0)
+
+Get milestone notifications sent directly to your email:
+
+```bash
+# Create meter with email notifications
+meter.py create my-meter \
+  --notify-email you@example.com \
+  --from-email verified@yourdomain.com \
+  -d "My tracked event"
+
+# Add milestones as usual
+meter.py milestone my-meter -t hours -v 24 -m "🎉 24 hours complete!"
+
+# When check-milestones runs and a milestone fires, email is sent automatically
+meter.py check-milestones
+# → Triggers milestone AND sends email notification
+```
+
+**Email includes:**
+- 🎯 Milestone message
+- ⏱️ Current elapsed time
+- 📝 Meter description
+
+Requires `SENDGRID_API_KEY` environment variable.
+
 ### Milestone Notifications: Heartbeat vs Cron
 
 **Recommended: HEARTBEAT** (~30 min resolution)
