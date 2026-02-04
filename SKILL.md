@@ -145,6 +145,55 @@ meter.py career [--meter M] [--rate R] [--raise-pct P]
 meter.py export [name]              # JSON export
 ```
 
+## SendGrid Email Webhook Server
+
+Receive real-time notifications when recipients open, click, bounce, or unsubscribe from your meter verification emails.
+
+### Setup
+
+```bash
+# Start webhook server with Discord webhook (recommended)
+python sendgrid_webhook.py --port 8089 --discord-webhook https://discord.com/api/webhooks/xxx/yyy
+
+# Or process events manually (for agent to post)
+python sendgrid_webhook.py --process-events
+python sendgrid_webhook.py --process-events --json
+```
+
+### Discord Webhook Setup (Recommended)
+
+1. In your Discord channel, go to **Settings > Integrations > Webhooks**
+2. Click **New Webhook**, copy the URL
+3. Pass to `--discord-webhook` or set `DISCORD_WEBHOOK_URL` env var
+
+### SendGrid Setup
+
+1. Go to **SendGrid > Settings > Mail Settings > Event Webhook**
+2. Set HTTP POST URL to: `https://your-domain.com/webhooks/sendgrid`
+3. Select events: Delivered, Opens, Clicks, Bounces, Unsubscribes, Spam Reports
+4. (Optional) Enable **Signed Event Webhook** and set `SENDGRID_WEBHOOK_PUBLIC_KEY`
+
+### Event Types
+
+| Event | Emoji | Description |
+|-------|-------|-------------|
+| delivered | ✅ | Email reached recipient |
+| open | 👀 | Recipient opened email |
+| click | 🔗 | Recipient clicked a link |
+| bounce | ⚠️ | Email bounced |
+| unsubscribe | 🔕 | Recipient unsubscribed |
+| spamreport | 🚨 | Marked as spam |
+
+### Environment Variables
+
+```bash
+SENDGRID_WEBHOOK_PUBLIC_KEY    # For signature verification (optional)
+SENDGRID_WEBHOOK_MAX_AGE_SECONDS  # Max timestamp age (default: 300)
+WEBHOOK_PORT                   # Server port (default: 8089)
+DISCORD_WEBHOOK_URL            # Discord webhook URL
+WEBHOOK_LOG_FILE               # Log file path
+```
+
 ## The 80,000 Hours Concept
 
 Career as finite inventory: 40 years × 2,000 hrs/year = 80,000 hours.

@@ -173,6 +173,31 @@ meter.py verify smoke-free "A7F3-B92C-1D4E-8F6A-7"
 
 ---
 
+## 📡 SendGrid Webhook Server (New in v1.2.0!)
+
+Get real-time notifications when recipients interact with your meter verification emails:
+
+```bash
+# Start webhook server with Discord webhook
+python sendgrid_webhook.py --port 8089 \
+  --discord-webhook https://discord.com/api/webhooks/xxx/yyy
+
+# Events supported:
+# ✅ delivered - Email reached recipient
+# 👀 open      - Recipient opened email  
+# 🔗 click     - Recipient clicked a link
+# ⚠️ bounce    - Email bounced
+# 🔕 unsubscribe - Recipient unsubscribed
+# 🚨 spamreport  - Marked as spam
+```
+
+Or process events manually for agent integration:
+```bash
+python sendgrid_webhook.py --process-events --json
+```
+
+---
+
 ## 🎯 Use Cases
 
 - **Quit Tracking** — Smoking, drinking, or any habit you're breaking
