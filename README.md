@@ -196,6 +196,16 @@ Or process events manually for agent integration:
 python sendgrid_webhook.py --process-events --json
 ```
 
+### SendGrid Configuration
+
+![SendGrid Webhook Setup](docs/sendgrid-webhook-setup.png)
+
+1. Go to **SendGrid > Settings > Mail Settings > Event Webhook**
+2. Enter your webhook URL: `https://your-server.com/webhooks/sendgrid`
+3. Select all event types you want to receive
+4. Click **"Test Integration"** to verify all events fire correctly
+5. **Don't forget to click Save!**
+
 ---
 
 ## 🎯 Use Cases

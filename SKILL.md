@@ -169,9 +169,17 @@ python sendgrid_webhook.py --process-events --json
 ### SendGrid Setup
 
 1. Go to **SendGrid > Settings > Mail Settings > Event Webhook**
-2. Set HTTP POST URL to: `https://your-domain.com/webhooks/sendgrid`
-3. Select events: Delivered, Opens, Clicks, Bounces, Unsubscribes, Spam Reports
-4. (Optional) Enable **Signed Event Webhook** and set `SENDGRID_WEBHOOK_PUBLIC_KEY`
+2. Click **"Create new webhook"** (or edit existing)
+3. Set HTTP POST URL to: `https://your-domain.com/webhooks/sendgrid`
+4. Select all event types under **Actions to be posted**:
+   - **Engagement data:** Opened, Clicked, Unsubscribed, Spam Reports, Group Unsubscribes, Group Resubscribes
+   - **Deliverability Data:** Processed, Dropped, Deferred, Bounced, Delivered
+   - **Account Data:** Account Status Change
+5. Click **"Test Integration"** to verify - this fires all event types to your webhook
+6. **Important:** Click **Save** to enable the webhook!
+7. (Optional) Enable **Signed Event Webhook** for security and set `SENDGRID_WEBHOOK_PUBLIC_KEY`
+
+![SendGrid Webhook Setup](docs/sendgrid-webhook-setup.png)
 
 ### Event Types
 
