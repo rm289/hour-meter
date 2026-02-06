@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Hour Meter - Tamper-evident elapsed time tracker with milestones
+TARDIS - Tamper-evident elapsed time tracker with milestones (formerly Hour Meter)
 
 Three modes:
 - COUNT UP: Time since an event (quit smoking, project start)
@@ -442,16 +442,22 @@ def send_email_sendgrid(to_email: str, subject: str, html_content: str, text_con
     
     # Default from email
     if not from_email:
-        from_email = os.environ.get("SENDGRID_FROM_EMAIL", "hour-meter@noreply.example.com")
+        from_email = os.environ.get("SENDGRID_FROM_EMAIL", "tardis@noreply.example.com")
     
     payload = {
         "personalizations": [{"to": [{"email": to_email}]}],
-        "from": {"email": from_email, "name": "Hour Meter"},
+        "from": {"email": from_email, "name": "TARDIS"},
         "subject": subject,
         "content": [
             {"type": "text/plain", "value": text_content},
             {"type": "text/html", "value": html_content}
-        ]
+        ],
+        "tracking_settings": {
+            "subscription_tracking": {
+                "enable": True,
+                "substitution_tag": "<%asm_group_unsubscribe_url%>"
+            }
+        }
     }
     
     data = json.dumps(payload).encode('utf-8')
@@ -480,9 +486,9 @@ def generate_verification_email(meter_name: str, paper_code: str, full_hash: str
                                  description: str, lock_time: str) -> tuple[str, str, str]:
     """Generate email subject, HTML content, and text content for verification email."""
     
-    subject = f"🔒 Hour Meter Verification Code: {meter_name}"
+    subject = f"🔒 TARDIS Verification Code: {meter_name}"
     
-    text_content = f"""HOUR METER VERIFICATION CODE
+    text_content = f"""TARDIS VERIFICATION CODE
 {'='*40}
 
 Meter: {meter_name}
@@ -501,6 +507,11 @@ Full hash: {full_hash}
 ---
 This code proves the meter hasn't been tampered with.
 Keep this email - you'll need the paper code to verify.
+
+Sent by TARDIS
+
+
+To unsubscribe: <%asm_group_unsubscribe_raw_url%>
 """
     
     html_content = f"""
@@ -552,6 +563,11 @@ Keep this email - you'll need the paper code to verify.
             <p>This code proves your meter hasn't been tampered with.</p>
             <p>Keep this email safe - you'll need the paper code to verify.</p>
             <p class="hash">Full hash: {full_hash}</p>
+            <p style="margin-top: 15px;">⏱️ Sent by TARDIS</p>
+            <br><br>
+            <p style="font-size: 11px; color: #aaa;">
+                <a href="<%asm_group_unsubscribe_url%>" style="color: #aaa;">Click here to unsubscribe</a> from TARDIS notifications.
+            </p>
         </div>
     </div>
 </body>
@@ -576,7 +592,7 @@ def send_milestone_email(to_email: str, meter_name: str, milestone_message: str,
     
     subject = f"🎯 Milestone: {meter_name}"
     
-    text_content = f"""HOUR METER MILESTONE REACHED!
+    text_content = f"""TARDIS MILESTONE REACHED!
 {'='*40}
 
 Meter: {meter_name}
@@ -588,7 +604,10 @@ Description: {description or 'N/A'}
 ⏱️ Elapsed: {elapsed_str}
 
 ---
-Sent by Hour Meter
+Sent by TARDIS
+
+
+To unsubscribe from these notifications: <%asm_group_unsubscribe_raw_url%>
 """
     
     html_content = f"""
@@ -622,7 +641,11 @@ Sent by Hour Meter
         </div>
         
         <div class="footer">
-            <p>⏱️ Sent by Hour Meter</p>
+            <p>⏱️ Sent by TARDIS</p>
+            <br><br>
+            <p style="font-size: 11px; color: #aaa;">
+                <a href="<%asm_group_unsubscribe_url%>" style="color: #aaa;">Click here to unsubscribe</a> from TARDIS milestone notifications.
+            </p>
         </div>
     </div>
 </body>
@@ -631,12 +654,18 @@ Sent by Hour Meter
     
     payload = {
         "personalizations": [{"to": [{"email": to_email}]}],
-        "from": {"email": from_email, "name": "Hour Meter"},
+        "from": {"email": from_email, "name": "TARDIS"},
         "subject": subject,
         "content": [
             {"type": "text/plain", "value": text_content},
             {"type": "text/html", "value": html_content}
-        ]
+        ],
+        "tracking_settings": {
+            "subscription_tracking": {
+                "enable": True,
+                "substitution_tag": "<%asm_group_unsubscribe_url%>"
+            }
+        }
     }
     
     data = json.dumps(payload).encode('utf-8')
@@ -666,9 +695,9 @@ def generate_mailto_link(meter_name: str, paper_code: str, full_hash: str,
     """Generate a mailto: link for emailing the verification code to yourself."""
     import urllib.parse
     
-    subject = f"🔒 Hour Meter Verification Code: {meter_name}"
+    subject = f"🔒 TARDIS Verification Code: {meter_name}"
     
-    body = f"""HOUR METER VERIFICATION CODE
+    body = f"""TARDIS VERIFICATION CODE
 ============================
 
 Meter: {meter_name}
@@ -687,6 +716,8 @@ Full hash: {full_hash}
 ---
 This code proves the meter hasn't been tampered with.
 Keep this email - you'll need the paper code to verify.
+
+Sent by TARDIS
 """
     
     mailto = f"mailto:?subject={urllib.parse.quote(subject)}&body={urllib.parse.quote(body)}"
@@ -1084,7 +1115,7 @@ def cmd_career(args):
     print(f"   🎯 REMAINING EARNING POTENTIAL: {format_money(total_earnings)}")
 
 def main():
-    parser = argparse.ArgumentParser(description="Hour Meter - Life event tracker")
+    parser = argparse.ArgumentParser(description="TARDIS - Life event tracker")
     subparsers = parser.add_subparsers(dest="command", required=True)
     
     # Create
