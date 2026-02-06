@@ -2,8 +2,12 @@
 # Check and restart SendGrid webhook services if down
 # Only outputs when a restart happens
 
+# Source .env for Discord webhook URL
+if [ -f /root/.env ]; then
+    export $(grep -v '^#' /root/.env | xargs)
+fi
+
 WEBHOOK_PORT=8089
-# Set your Discord webhook URL here or via environment variable
 DISCORD_WEBHOOK="${TARDIS_DISCORD_WEBHOOK:-}"
 RESTART_NEEDED=false
 RESTARTED=""
