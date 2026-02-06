@@ -222,6 +222,37 @@ python sendgrid_webhook.py --process-events --json
 4. Click **"Test Integration"** to verify all events fire correctly
 5. **Don't forget to click Save!**
 
+### Exposing Your Webhook (Tunnels)
+
+Since SendGrid needs to reach your webhook server, you'll need a public URL. Here are your options:
+
+**Option 1: Cloudflare Tunnel (Recommended for production)**
+```bash
+# One-time setup (free Cloudflare account required)
+cloudflared tunnel login
+cloudflared tunnel create tardis-webhook
+
+# Run the tunnel (permanent URL)
+cloudflared tunnel run --url http://localhost:8089 tardis-webhook
+```
+
+**Option 2: Temporary Cloudflare Tunnel (No account needed)**
+```bash
+# Quick & free, but URL changes each restart
+cloudflared tunnel --url http://localhost:8089
+# Gives you: https://random-words.trycloudflare.com
+```
+
+**Option 3: ngrok (Free tier available)**
+```bash
+# Sign up at ngrok.com for a free auth token
+ngrok http 8089
+```
+
+After starting your tunnel, update the webhook URL in SendGrid settings.
+
+> **Note:** The unsubscribe functionality works regardless of whether you run the webhook server—SendGrid handles unsubscribes server-side. The webhook just lets you *see* the events for logging and analytics.
+
 ---
 
 ## 🎯 Use Cases
