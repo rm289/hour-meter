@@ -212,7 +212,10 @@ def send_to_discord(message: str) -> Tuple[bool, str]:
             req = urllib.request.Request(
                 discord_webhook_url,
                 data=data,
-                headers={"Content-Type": "application/json"},
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "TARDIS-Webhook/1.0"
+                },
                 method="POST"
             )
             with urllib.request.urlopen(req, timeout=10) as response:
