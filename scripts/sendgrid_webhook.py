@@ -208,7 +208,11 @@ def send_to_discord(message: str) -> Tuple[bool, str]:
     # Method 1: Direct Discord Webhook (preferred - no dependencies)
     discord_webhook_url = config.get("discord_webhook_url")
     if discord_webhook_url:
-        payload = {"content": message}
+        payload = {
+            "content": message,
+            "username": "TARDIS",
+            "avatar_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Tardis_BBC.svg/240px-Tardis_BBC.svg.png"
+        }
         data = json.dumps(payload).encode("utf-8")
         
         try:
