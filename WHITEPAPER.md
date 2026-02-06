@@ -61,7 +61,7 @@ Each meter is stored as a JSON object:
   "mode": "between",
   "milestones": [...],
   "notify_channel": "discord",
-  "notify_target": "1289044017803300957",
+  "notify_target": "YOUR_CHANNEL_ID",
   "completed_fired": false
 }
 ```
@@ -252,7 +252,7 @@ The `check-milestones` command:
       "value": 720,
       "message": "🎉 30 days smoke-free!",
       "channel": "discord",
-      "target": "1289044017803300957",
+      "target": "YOUR_CHANNEL_ID",
       "description": "Last cigarette"
     }
   ]
@@ -301,7 +301,7 @@ Point Dropbox, iCloud Drive, or Google Drive at `~/.openclaw/` to automatically 
 # Create with quit date
 meter.py create smoke-free --start "2025-06-15T08:00:00Z" \
   -d "Last cigarette - freedom begins" \
-  --channel discord --target "1289044017803300957"
+  --channel discord --target "YOUR_CHANNEL_ID"
 
 # Add health milestones
 meter.py milestone smoke-free -t hours -v 24 \

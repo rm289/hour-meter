@@ -3,7 +3,8 @@
 # Only outputs when a restart happens
 
 WEBHOOK_PORT=8089
-DISCORD_WEBHOOK="https://discord.com/api/webhooks/1469146293556351057/cN3c2EPA8eTdfTfyioPetVeFWka3d8QBPbYvMo0sj638QsPevdenlGePuC56wcaj8Nws"
+# Set your Discord webhook URL here or via environment variable
+DISCORD_WEBHOOK="${TARDIS_DISCORD_WEBHOOK:-}"
 RESTART_NEEDED=false
 RESTARTED=""
 
