@@ -253,6 +253,22 @@ After starting your tunnel, update the webhook URL in SendGrid settings.
 
 > **Note:** The unsubscribe functionality works regardless of whether you run the webhook server—SendGrid handles unsubscribes server-side. The webhook just lets you *see* the events for logging and analytics.
 
+### Discord Webhook Setup (Recommended)
+
+For reliable Discord notifications, use a Discord webhook URL directly:
+
+```bash
+python sendgrid_webhook.py --port 8089 \
+  --discord-webhook "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+```
+
+To create a Discord webhook:
+1. **Server Settings** → **Integrations** → **Webhooks**
+2. Click **New Webhook**
+3. Select your channel and copy the URL
+
+> **Troubleshooting:** If you get HTTP 403 errors, ensure your code includes a `User-Agent` header—Discord/Cloudflare blocks requests without one.
+
 ---
 
 ## 🎯 Use Cases
