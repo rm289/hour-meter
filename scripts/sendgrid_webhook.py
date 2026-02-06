@@ -161,12 +161,15 @@ def format_event_message(event: Dict[str, Any]) -> str:
     recipient = event.get("email", "unknown")
     timestamp = event.get("timestamp")
     
-    # Format timestamp
+    # Format timestamp in Eastern Time
     time_str = ""
     if timestamp:
         try:
+            from zoneinfo import ZoneInfo
             dt = datetime.fromtimestamp(int(timestamp), tz=timezone.utc)
-            time_str = dt.strftime('%Y-%m-%d %H:%M:%S UTC')
+            dt_eastern = dt.astimezone(ZoneInfo("America/New_York"))
+            tz_name = "EDT" if dt_eastern.dst() else "EST"
+            time_str = dt_eastern.strftime(f'%Y-%m-%d %H:%M:%S {tz_name}')
         except (TypeError, ValueError):
             pass
     
