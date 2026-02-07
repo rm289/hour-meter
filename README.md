@@ -302,10 +302,22 @@ If the timestamp was changed, the hashes won't match. Simple, offline-capable, a
 
 ---
 
+## 🔒 Security Considerations
+
+**Environment Variables:** `meter.py` will auto-load variables from `~/.env` if `SENDGRID_API_KEY` is not already in the environment. This is opt-in behavior — if you don't use SendGrid email features, no `.env` file is accessed.
+
+**Webhook Server:** `sendgrid_webhook.py` can forward events to a Discord webhook URL or OpenClaw gateway. These are user-configured destinations — the server never sends data anywhere without explicit configuration.
+
+**ACTION: Triggers (Advanced):** Milestone messages can optionally be prefixed with `ACTION:` to signal your agent to execute them as instructions rather than just posting them. This is **not enabled by default** — it requires explicit configuration in your `HEARTBEAT.md`. If you use this feature, ensure your `meters.json` file is protected from unauthorized modification.
+
+**Meter Storage:** Meter data is stored in `~/.openclaw/meters.json`. The tamper-evident locking feature detects unauthorized changes to locked meters, but unlocked meters can be freely modified.
+
+---
+
 ## 📄 License
 
 MIT — Use it, modify it, ship it.
 
 ---
 
-**Hour Meter** — Because some moments are worth proving. ⏱️
+**TARDIS** — Because some moments are worth proving. ⏱️

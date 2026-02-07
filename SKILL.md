@@ -133,23 +133,21 @@ Requires `SENDGRID_API_KEY` environment variable.
 - Cost-efficient: shares token usage with other heartbeat tasks
 - Good for most use cases (quit tracking, career milestones, etc.)
 
-### ACTION: Triggers (Agent Automation)
+### Milestone Messages
 
-Prefix milestone messages with `ACTION:` to trigger agent execution instead of just posting:
+Milestones post their message text to the configured notification channel when triggered:
 
 ```bash
-# Just posts the message
+# Posts the message when milestone fires
 meter.py milestone my-meter -t hours -v 24 -m "🎉 24 hours complete!"
-
-# Triggers agent to EXECUTE the instruction
-meter.py milestone my-meter -t hours -v 24 -m "ACTION: Check the weather and post a summary"
 ```
 
 Configure in HEARTBEAT.md:
 ```markdown
-- If message starts with "ACTION:", execute it as an instruction
-- Otherwise, post the message to the configured channel
+- Run meter.py check-milestones and post triggered milestone messages to the configured channel
 ```
+
+> **Advanced:** Milestone messages prefixed with `ACTION:` can optionally be treated as agent instructions by your heartbeat config. This is an opt-in feature — see README.md for security considerations.
 
 **Alternative: CRON** (precise timing)
 - Use when exact timing matters (e.g., countdown to event)
