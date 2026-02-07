@@ -436,7 +436,8 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
 def run_server(port: int) -> None:
     """Run the webhook server."""
-    server_address = ("", port)
+    bind_addr = os.environ.get("WEBHOOK_BIND_ADDR", "127.0.0.1")
+    server_address = (bind_addr, port)
     httpd = HTTPServer(server_address, WebhookHandler)
     
     log(f"Starting SendGrid webhook server on port {port}")
