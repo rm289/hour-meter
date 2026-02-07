@@ -91,9 +91,36 @@ def log(message: str, level: str = "INFO") -> None:
             print(f"[WARN] Could not write to log file: {e}")
 
 
+def _load_dotenv():
+    """Load .env file if key env vars not already set."""
+    env_paths = [
+        os.path.expanduser("~/.env"),
+        "/root/.env",
+        ".env"
+    ]
+    for env_path in env_paths:
+        if os.path.exists(env_path):
+            try:
+                with open(env_path) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            key, value = line.split("=", 1)
+                            key = key.strip()
+                            value = value.strip().strip('"').strip("'")
+                            if key and key not in os.environ:
+                                os.environ[key] = value
+                break
+            except Exception:
+                pass
+
+_load_dotenv()
+
+
 def get_webhook_public_key() -> str:
     """Get SendGrid webhook public key from environment."""
-    return os.environ.get("SENDGRID_WEBHOOK_PUBLIC_KEY", "").strip()
+    return (os.environ.get("SENDGRID_WEBHOOK_VERIFICATION_KEY", "") or
+            os.environ.get("SENDGRID_WEBHOOK_PUBLIC_KEY", "")).strip()
 
 
 def get_max_age_seconds() -> int:
